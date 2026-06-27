@@ -35,9 +35,9 @@ export class HomeComponent implements OnInit {
   ];
 
   readonly salaryGroups = [
-    { value: CustomerGroup.SALARY_PUBLIC_OR_ETB_OR_HIGH_GOOD, label: 'Lĩnh vực công' },
-    { value: CustomerGroup.SALARY_PUBLIC_OR_ETB_OR_HIGH_GOOD, label: 'Khách hàng hiện hữu (ETB)' },
-    { value: CustomerGroup.SALARY_PUBLIC_OR_ETB_OR_HIGH_GOOD, label: 'MI ≥ 50tr và thuộc Good Company List' },
+    { value: CustomerGroup.SALARY_PUBLIC_OR_ETB_OR_HIGH_GOOD, label: 'Lĩnh vực công (x18, trần 1.2 tỷ)' },
+    { value: CustomerGroup.SALARY_PUBLIC_OR_ETB_OR_HIGH_GOOD, label: 'Khách hàng hiện hữu (ETB) (x18, trần 1.2 tỷ)' },
+    { value: CustomerGroup.SALARY_PUBLIC_OR_ETB_OR_HIGH_GOOD, label: 'MI ≥ 50tr và thuộc Good Company List (x18, trần 1.2 tỷ)' },
     { value: CustomerGroup.SALARY_HIGH_MI, label: 'MI ≥ 30tr (x18, trần 900tr)' },
     { value: CustomerGroup.SALARY_NORMAL, label: 'Thông thường (x12, trần 900tr)' }
   ];
