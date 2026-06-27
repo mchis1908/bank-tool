@@ -22,12 +22,12 @@ export class HomeComponent implements OnInit {
   readonly SpecialOfferType = SpecialOfferType;
 
   readonly loanTypes = [
-    { value: LoanType.PL_SALARY, label: 'PL-Salary (Vay lương)' },
-    { value: LoanType.PL_SGI, label: 'PL-SGI (Bảo lãnh)' }
+    { value: LoanType.PL_SALARY, label: 'PL-Salary' },
+    { value: LoanType.PL_SGI, label: 'PL-SGI' }
   ];
 
   readonly sgiGroups = [
-    { value: CustomerGroup.SGI_PROFESSIONAL, label: 'Professional (x12)' },
+    { value: CustomerGroup.SGI_PROFESSIONAL, label: 'Professional (x12) (công lập)' },
     { value: CustomerGroup.SGI_ELITE_ETB, label: 'Elite ETB (x18)' },
     { value: CustomerGroup.SGI_ELITE_HIGH_MI, label: 'Elite - MI ≥ 30tr (x18)' },
     { value: CustomerGroup.SGI_ELITE_GOOD_COMPANY, label: 'Elite - Good Company (x16)' },
@@ -35,7 +35,9 @@ export class HomeComponent implements OnInit {
   ];
 
   readonly salaryGroups = [
-    { value: CustomerGroup.SALARY_PUBLIC_OR_ETB_OR_HIGH_GOOD, label: 'Công ty lớn / ETB / High Good (x18)' },
+    { value: CustomerGroup.SALARY_PUBLIC_OR_ETB_OR_HIGH_GOOD, label: 'Lĩnh vực công' },
+    { value: CustomerGroup.SALARY_PUBLIC_OR_ETB_OR_HIGH_GOOD, label: 'Khách hàng hiện hữu (ETB)' },
+    { value: CustomerGroup.SALARY_PUBLIC_OR_ETB_OR_HIGH_GOOD, label: 'MI ≥ 50tr và thuộc Good Company List' },
     { value: CustomerGroup.SALARY_HIGH_MI, label: 'MI ≥ 30tr (x18, trần 900tr)' },
     { value: CustomerGroup.SALARY_NORMAL, label: 'Thông thường (x12, trần 900tr)' }
   ];

@@ -38,14 +38,14 @@ export class LoanSolverService {
     const allEvaluated: LoanSolution[] = [];
 
     // ===== 1. Kiểm tra phương án ĐÚNG mong muốn KH =====
+    // Luôn hiển thị card này nếu nằm trong giới hạn min/max của sản phẩm,
+    // KỂ CẢ khi DBR không đạt - để nhân viên thấy số liệu thực tế và tự tư vấn KH.
     let exactMatch: LoanSolution | null = null;
     if (input.desiredAmount <= maxTheoretical && input.desiredAmount >= limits.minAmount) {
       const scenario = this.calc.evaluateScenario(input, input.desiredAmount, input.desiredTerm);
       const solution = this.toSolution(scenario, input, 'EXACT');
       allEvaluated.push(solution);
-      if (solution.isValid) {
-        exactMatch = solution;
-      }
+      exactMatch = solution; // luôn gán, không cần kiểm tra isValid
     }
 
     // ===== 2. Nhóm A: Giữ số tiền vay, đổi kỳ hạn =====
@@ -83,11 +83,14 @@ export class LoanSolverService {
     const rankedKeepAmount = this.rankSolutions(keepAmountCandidates).slice(0, this.MAX_PER_GROUP);
     const rankedKeepTerm = this.rankSolutions(keepTermCandidates).slice(0, this.MAX_PER_GROUP);
 
-    const hasAnyValidSolution = !!exactMatch || rankedKeepAmount.length > 0 || rankedKeepTerm.length > 0;
+    const hasAnyValidSolution = !!exactMatch?.isValid || rankedKeepAmount.length > 0 || rankedKeepTerm.length > 0;
 
     // ===== 5. Nếu không có phương án hợp lệ nào -> lấy phương án DBR gần ngưỡng nhất (best effort) =====
+    // ===== 5. Best effort: chỉ áp dụng khi KHÔNG có exactMatch (vd: mong muốn KH
+    // nằm ngoài giới hạn min/max sản phẩm). Nếu exactMatch đã tồn tại (dù không đạt DBR),
+    // nó tự đóng vai trò "tham khảo gần nhất" rồi, không cần bestEffort trùng lặp.
     let bestEffort: LoanSolution | null = null;
-    if (!hasAnyValidSolution && allEvaluated.length > 0) {
+    if (!exactMatch && !hasAnyValidSolution && allEvaluated.length > 0) {
       bestEffort = allEvaluated.reduce((best, current) =>
         (current.dbr - current.dbrThreshold) < (best.dbr - best.dbrThreshold) ? current : best
       );
@@ -121,12 +124,6 @@ export class LoanSolverService {
     // Trọng số: số tiền quan trọng hơn kỳ hạn (theo nghiệp vụ đã thống nhất)
     const deviationFromDesired = (amountDeviation * 0.7 + termDeviation * 0.3) * 100;
 
-    const amortizationSchedule = this.calc.calculateAmortizationSchedule(
-      scenario.amount,
-      scenario.interestRate,
-      scenario.term
-    );
-
     return {
       amount: scenario.amount,
       term: scenario.term,
@@ -138,7 +135,7 @@ export class LoanSolverService {
       isValid: scenario.isValid,
       deviationFromDesired,
       groupTag,
-      amortizationSchedule
+      amortizationSchedule: scenario.amortizationSchedule
     };
   }
 
