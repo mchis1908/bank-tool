@@ -43,17 +43,17 @@ $shadow-card: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.05);
 }
 
 .header-inner {
-  max-width: 900px;
   margin: 0 auto;
   padding: 0 24px;
   height: 60px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .header-brand {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 14px;
 }
 
@@ -410,4 +410,124 @@ $shadow-card: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.05);
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.contact-card {
+  position: relative;
+  padding: 4px 18px;
+  border-radius: 14px;
+
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba($teal-400,.4);
+
+  overflow: hidden;
+  width: fit-content;
+  animation:
+  floating 2.5s ease-in-out infinite,
+  glow 2.5s ease-in-out infinite;
+}
+
+@keyframes floating {
+  0%,100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+  }
+
+  @keyframes glow {
+  0%,100% {
+    box-shadow: 0 0 8px rgba(0,191,165,.15);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(0,191,165,.35);
+  }
+}
+
+.contact-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.zalo-logo {
+  width: 28px;
+  height: 28px;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+
+  animation: pulse 1.5s infinite;
+}
+
+/* Vệt sáng chạy ngang */
+.contact-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+
+  width: 70%;
+  height: 100%;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.25),
+    transparent
+  );
+
+  animation: shine 4s linear infinite;
+}
+
+/* Badge phát sáng nhẹ */
+@keyframes cardBreath {
+  0%,100% {
+    box-shadow:
+      0 0 0 rgba(0,191,165,0),
+      0 0 8px rgba(0,191,165,.15);
+  }
+
+  50% {
+    box-shadow:
+      0 0 12px rgba(0,191,165,.4),
+      0 0 24px rgba(0,191,165,.2);
+  }
+}
+
+/* Chấm online */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16,185,129,.7);
+  }
+
+  70% {
+    box-shadow: 0 0 0 8px rgba(16,185,129,0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(16,185,129,0);
+  }
+}
+
+/* Vệt sáng */
+@keyframes shine {
+  from {
+    left: -150%;
+  }
+
+  to {
+    left: 150%;
+  }
 }
