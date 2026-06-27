@@ -1,0 +1,47 @@
+<div class="amort-wrap">
+  <!-- Summary bar -->
+  <div class="summary-bar">
+    <div class="summary-item">
+      <span class="summary-label">Tổng tiền trả</span>
+      <span class="summary-value">{{ fmt(totalPayment) }} đ</span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+      <span class="summary-label">Tổng gốc</span>
+      <span class="summary-value principal">{{ fmt(totalPrincipal) }} đ</span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+      <span class="summary-label">Tổng lãi</span>
+      <span class="summary-value interest">{{ fmt(totalInterest) }} đ</span>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <nz-table
+    #scheduleTable
+    [nzData]="rows"
+    [nzFrontPagination]="false"
+    [nzShowPagination]="false"
+    nzSize="small"
+    [nzScroll]="{ y: '400px' }">
+    <thead>
+      <tr>
+        <th nzWidth="70px" nzAlign="center">Tháng</th>
+        <th nzAlign="right">Trả / tháng</th>
+        <th nzAlign="right">Gốc</th>
+        <th nzAlign="right">Lãi</th>
+        <th nzAlign="right">Dư nợ còn lại</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of scheduleTable.data">
+        <td nzAlign="center" class="col-month">{{ row.month }}</td>
+        <td nzAlign="right" class="col-payment">{{ fmt(row.payment) }}</td>
+        <td nzAlign="right" class="col-principal">{{ fmt(row.principal) }}</td>
+        <td nzAlign="right" class="col-interest">{{ fmt(row.interest) }}</td>
+        <td nzAlign="right" class="col-balance">{{ fmt(row.balance) }}</td>
+      </tr>
+    </tbody>
+  </nz-table>
+</div>

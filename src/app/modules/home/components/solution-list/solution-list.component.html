@@ -1,0 +1,61 @@
+<div class="result-root">
+
+  <!-- No valid solutions -->
+  <div class="no-solution-banner" *ngIf="!hasValidSolutions && !bestEffort">
+    <div class="banner-icon">⚠️</div>
+    <div class="banner-content">
+      <p class="banner-title">Không tìm được phương án phù hợp</p>
+      <p class="banner-desc">DBR vượt ngưỡng ở tất cả tổ hợp số tiền × kỳ hạn trong giới hạn sản phẩm. Hãy điều chỉnh khoản vay mong muốn hoặc giảm nghĩa vụ nợ hiện hữu.</p>
+    </div>
+  </div>
+
+  <!-- Best effort fallback -->
+  <div class="best-effort-banner" *ngIf="!hasValidSolutions && bestEffort">
+    <div class="banner-icon">🔍</div>
+    <div class="banner-content">
+      <p class="banner-title">Không có phương án đạt DBR — hiển thị phương án gần nhất</p>
+      <p class="banner-desc">Phương án dưới đây có DBR vượt ngưỡng, nhưng là tốt nhất có thể. Cần cân nhắc lại khoản mong muốn.</p>
+    </div>
+    <app-solution-card [solution]="bestEffort!" [highlight]="false" [isBestEffort]="true"></app-solution-card>
+  </div>
+
+  <!-- Exact match -->
+  <div class="solution-group" *ngIf="exactMatch">
+    <div class="group-header">
+      <span class="group-badge exact">✓ Đúng yêu cầu</span>
+      <span class="group-desc">Số tiền & kỳ hạn khớp hoàn toàn với mong muốn</span>
+    </div>
+    <app-solution-card [solution]="exactMatch" [highlight]="true"></app-solution-card>
+  </div>
+
+  <!-- Keep amount, change term -->
+  <div class="solution-group" *ngIf="keepAmountSolutions.length > 0">
+    <div class="group-header">
+      <span class="group-badge amount">↕ Giữ số tiền, đổi kỳ hạn</span>
+      <span class="group-desc">Số tiền giữ nguyên, điều chỉnh kỳ hạn để đạt DBR</span>
+    </div>
+    <div class="solution-row">
+      <app-solution-card
+        *ngFor="let sol of keepAmountSolutions"
+        [solution]="sol"
+        [highlight]="false">
+      </app-solution-card>
+    </div>
+  </div>
+
+  <!-- Keep term, change amount -->
+  <div class="solution-group" *ngIf="keepTermSolutions.length > 0">
+    <div class="group-header">
+      <span class="group-badge term">↔ Giữ kỳ hạn, đổi số tiền</span>
+      <span class="group-desc">Kỳ hạn giữ nguyên, điều chỉnh số tiền vay</span>
+    </div>
+    <div class="solution-row">
+      <app-solution-card
+        *ngFor="let sol of keepTermSolutions"
+        [solution]="sol"
+        [highlight]="false">
+      </app-solution-card>
+    </div>
+  </div>
+
+</div>

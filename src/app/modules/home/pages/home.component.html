@@ -1,0 +1,218 @@
+<div class="page-wrapper">
+
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <span class="brand-mark">SHB</span>
+        <div class="brand-text">
+          <span class="brand-title">Loan Advisor</span>
+          <span class="brand-sub">DBR Calculator & Solution Recommender</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+      <!-- ======================== SECTION 1: THÔNG TIN CƠ BẢN ======================== -->
+      <section class="card">
+        <div class="card-label">01</div>
+        <h2 class="card-title">Thông tin khoản vay</h2>
+
+        <div class="field-grid">
+
+          <div class="field-group full-width">
+            <label class="field-label">Loại sản phẩm</label>
+            <div class="segment-control">
+              <label *ngFor="let t of loanTypes" class="segment-option">
+                <input type="radio" formControlName="loanType" [value]="t.value">
+                <span class="segment-label">{{ t.label }}</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Thu nhập ròng / tháng (MI)</label>
+            <div class="input-wrap">
+              <input class="field-input" appVndInput formControlName="mi" placeholder="VD: 15.000.000">
+              <span class="input-suffix">VNĐ</span>
+            </div>
+            <span class="field-error" *ngIf="form.get('mi')?.invalid && form.get('mi')?.touched">
+              Nhập MI hợp lệ (≥ 1 triệu)
+            </span>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Nhóm khách hàng</label>
+            <select class="field-select" formControlName="customerGroup">
+              <option *ngFor="let g of customerGroups" [value]="g.value">{{ g.label }}</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Loại khách hàng (lãi suất)</label>
+            <select class="field-select" formControlName="rateCustomerType">
+              <option *ngFor="let r of rateTypes" [value]="r.value">{{ r.label }}</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Chương trình ưu đãi đặc biệt</label>
+            <select class="field-select" formControlName="specialOffer">
+              <option *ngFor="let o of specialOffers" [value]="o.value">{{ o.label }}</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Số tiền mong muốn</label>
+            <div class="input-wrap">
+              <input class="field-input" appVndInput formControlName="desiredAmount"
+                placeholder="VD: 200.000.000" min="25000000">
+              <span class="input-suffix">VNĐ</span>
+            </div>
+            <span class="field-error" *ngIf="form.get('desiredAmount')?.invalid && form.get('desiredAmount')?.touched">
+              Tối thiểu 25 triệu VNĐ
+            </span>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Kỳ hạn mong muốn</label>
+            <div class="term-buttons">
+              <label *ngFor="let t of termOptions" class="term-option">
+                <input type="radio" formControlName="desiredTerm" [value]="t">
+                <span class="term-label">{{ t }} tháng</span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- SGI Guarantee -->
+        <div class="collapsible-section" *ngIf="isSGI">
+          <label class="toggle-row">
+            <input type="checkbox" formControlName="hasSgiGuarantee" class="toggle-check">
+            <span class="toggle-text">Có khoản SGI bảo lãnh hiện hữu</span>
+          </label>
+          <div class="collapsible-body" *ngIf="form.get('hasSgiGuarantee')?.value">
+            <div class="field-grid">
+              <div class="field-group">
+                <label class="field-label">Số tiền SGI đã duyệt</label>
+                <div class="input-wrap">
+                  <input class="field-input" type="number" formControlName="sgiApprovedAmount" placeholder="VNĐ">
+                  <span class="input-suffix">VNĐ</span>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="toggle-row mt-sm">
+                  <input type="checkbox" formControlName="sgiAfterJul2024" class="toggle-check">
+                  <span class="toggle-text">Phát sinh sau 07/2024 (+4%)</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ======================== SECTION 2: NGHĨA VỤ NỢ ======================== -->
+      <section class="card">
+        <div class="card-label">02</div>
+        <h2 class="card-title">Nghĩa vụ nợ hiện có</h2>
+        <p class="card-desc">Dùng để tính DBR. Bỏ trống = 0.</p>
+
+        <div class="field-grid">
+
+          <div class="field-group">
+            <label class="field-label">Nợ Shinhan hiện hữu / tháng</label>
+            <div class="input-wrap">
+              <input class="field-input" type="number" formControlName="monthlyShinhanDebt" min="0">
+              <span class="input-suffix">VNĐ</span>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Nợ TCTD khác / tháng</label>
+            <div class="input-wrap">
+              <input class="field-input" type="number" formControlName="monthlyOtherTctdDebt" min="0">
+              <span class="input-suffix">VNĐ</span>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Dư nợ TB thẻ tín dụng</label>
+            <div class="input-wrap">
+              <input class="field-input" type="number" formControlName="creditCardAvgBalance" min="0">
+              <span class="input-suffix">VNĐ</span>
+            </div>
+            <span class="field-hint">Sẽ tính 5% vào nghĩa vụ nợ</span>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Hạn mức thấu chi cao nhất</label>
+            <div class="input-wrap">
+              <input class="field-input" type="number" formControlName="overdraftLimit" min="0">
+              <span class="input-suffix">VNĐ</span>
+            </div>
+            <span class="field-hint">Sẽ tính 5% vào nghĩa vụ nợ</span>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Khoản vay khác quy đổi / tháng</label>
+            <div class="input-wrap">
+              <input class="field-input" type="number" formControlName="otherLoanEquivalent" min="0">
+              <span class="input-suffix">VNĐ</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Spouse debt -->
+        <div class="collapsible-section">
+          <label class="toggle-row">
+            <input type="checkbox" formControlName="hasSpouseDebt" class="toggle-check">
+            <span class="toggle-text">Cộng thu nhập / nợ vợ/chồng</span>
+          </label>
+          <div class="collapsible-body" *ngIf="form.get('hasSpouseDebt')?.value">
+            <div class="field-grid">
+              <div class="field-group">
+                <label class="field-label">MI vợ/chồng</label>
+                <div class="input-wrap">
+                  <input class="field-input" type="number" formControlName="spouseMI" min="0">
+                  <span class="input-suffix">VNĐ</span>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Nợ vợ/chồng tại Shinhan / tháng</label>
+                <div class="input-wrap">
+                  <input class="field-input" type="number" formControlName="spouseDebtAtShinhan" min="0">
+                  <span class="input-suffix">VNĐ</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn-ghost" (click)="onReset()">Nhập lại</button>
+        <button type="submit" class="btn-primary" [disabled]="isLoading">
+          <span *ngIf="!isLoading">Tính toán & Đề xuất</span>
+          <span *ngIf="isLoading" class="loading-dots">
+            <span></span><span></span><span></span>
+          </span>
+        </button>
+      </div>
+
+    </form>
+
+    <!-- ======================== KẾT QUẢ ======================== -->
+    <div class="results-section" *ngIf="result">
+      <app-solution-list [result]="result"></app-solution-list>
+    </div>
+
+  </main>
+</div>

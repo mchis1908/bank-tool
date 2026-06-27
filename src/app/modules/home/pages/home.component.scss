@@ -1,0 +1,413 @@
+// Design tokens — financial tool aesthetic: precise, data-dense, trustworthy
+// Palette: deep navy + electric teal accent on off-white ground
+$navy-900: #0D1B2A;
+$navy-700: #1B3050;
+$navy-500: #2C4A6E;
+$teal-400: #00BFA5;
+$teal-300: #26D0BD;
+$teal-100: #E0F7F4;
+$amber-500: #F59E0B;
+$amber-100: #FEF3C7;
+$red-500: #EF4444;
+$red-100: #FEE2E2;
+$green-500: #10B981;
+$green-100: #D1FAE5;
+$white: #FFFFFF;
+$gray-50: #F8FAFC;
+$gray-100: #F1F5F9;
+$gray-200: #E2E8F0;
+$gray-400: #94A3B8;
+$gray-600: #475569;
+$gray-800: #1E293B;
+
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 16px;
+$shadow-card: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.05);
+
+// ========= Page Shell =========
+.page-wrapper {
+  min-height: 100vh;
+  background: $gray-50;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: $gray-800;
+}
+
+// ========= Header =========
+.page-header {
+  background: $navy-900;
+  border-bottom: 3px solid $teal-400;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-mark {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: $teal-400;
+  background: rgba($teal-400, 0.12);
+  border: 1.5px solid rgba($teal-400, 0.4);
+  border-radius: $radius-sm;
+  padding: 2px 8px;
+  font-family: 'SF Mono', 'Fira Mono', monospace;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.brand-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: $white;
+  letter-spacing: -0.2px;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: rgba($white, 0.5);
+  font-weight: 400;
+  letter-spacing: 0.3px;
+}
+
+// ========= Main Content =========
+.page-main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+
+// ========= Cards =========
+.card {
+  background: $white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  padding: 32px;
+  margin-bottom: 20px;
+  border: 1px solid $gray-200;
+  position: relative;
+}
+
+.card-label {
+  position: absolute;
+  top: 28px;
+  right: 32px;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba($teal-400, 0.6);
+  font-family: 'SF Mono', 'Fira Mono', monospace;
+  letter-spacing: 1px;
+}
+
+.card-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: $navy-900;
+  margin: 0 0 6px;
+  letter-spacing: -0.3px;
+}
+
+.card-desc {
+  font-size: 13px;
+  color: $gray-400;
+  margin: 0 0 24px;
+}
+
+// ========= Field Grid =========
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 24px;
+  margin-top: 24px;
+
+  @media (max-width: 620px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+.field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: $gray-600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.field-hint {
+  font-size: 11px;
+  color: $gray-400;
+  margin-top: 2px;
+}
+
+.field-error {
+  font-size: 11px;
+  color: $red-500;
+  font-weight: 500;
+}
+
+// ========= Input =========
+.input-wrap {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid $gray-200;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  transition: border-color .15s;
+
+  &:focus-within {
+    border-color: $teal-400;
+    box-shadow: 0 0 0 3px rgba($teal-400, .12);
+  }
+}
+
+.field-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: $gray-800;
+  background: transparent;
+  min-width: 0;
+
+  &::placeholder { color: $gray-400; }
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+}
+
+.input-suffix {
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: $gray-400;
+  border-left: 1px solid $gray-200;
+  white-space: nowrap;
+  background: $gray-50;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+}
+
+.field-select {
+  border: 1.5px solid $gray-200;
+  border-radius: $radius-sm;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: $gray-800;
+  background: $white;
+  cursor: pointer;
+  width: 100%;
+  outline: none;
+  transition: border-color .15s;
+
+  &:focus {
+    border-color: $teal-400;
+    box-shadow: 0 0 0 3px rgba($teal-400, .12);
+  }
+}
+
+// ========= Segment Control =========
+.segment-control {
+  display: flex;
+  gap: 8px;
+}
+
+.segment-option {
+  flex: 1;
+  cursor: pointer;
+
+  input[type="radio"] { display: none; }
+
+  .segment-label {
+    display: block;
+    text-align: center;
+    padding: 9px 16px;
+    border: 1.5px solid $gray-200;
+    border-radius: $radius-sm;
+    font-size: 13px;
+    font-weight: 500;
+    color: $gray-600;
+    transition: all .15s;
+    background: $white;
+  }
+
+  input:checked + .segment-label {
+    border-color: $teal-400;
+    background: $teal-100;
+    color: $navy-700;
+    font-weight: 600;
+  }
+}
+
+// ========= Term Buttons =========
+.term-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.term-option {
+  cursor: pointer;
+  input[type="radio"] { display: none; }
+
+  .term-label {
+    display: block;
+    padding: 8px 14px;
+    border: 1.5px solid $gray-200;
+    border-radius: $radius-sm;
+    font-size: 13px;
+    font-weight: 500;
+    color: $gray-600;
+    transition: all .15s;
+    white-space: nowrap;
+    background: $white;
+  }
+
+  input:checked + .term-label {
+    border-color: $teal-400;
+    background: $teal-100;
+    color: $navy-700;
+    font-weight: 700;
+  }
+}
+
+// ========= Toggle / Collapsible =========
+.collapsible-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid $gray-100;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+
+  &.mt-sm { margin-top: 8px; }
+}
+
+.toggle-check {
+  width: 16px;
+  height: 16px;
+  accent-color: $teal-400;
+  cursor: pointer;
+}
+
+.toggle-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: $gray-600;
+}
+
+.collapsible-body {
+  margin-top: 16px;
+  padding: 16px;
+  background: $gray-50;
+  border-radius: $radius-md;
+  border: 1px solid $gray-200;
+}
+
+// ========= Form Actions =========
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.btn-primary {
+  padding: 12px 32px;
+  background: $teal-400;
+  color: $navy-900;
+  border: none;
+  border-radius: $radius-sm;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  transition: all .15s;
+  min-width: 180px;
+
+  &:hover:not(:disabled) { background: $teal-300; transform: translateY(-1px); }
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+}
+
+.btn-ghost {
+  padding: 12px 24px;
+  background: transparent;
+  color: $gray-600;
+  border: 1.5px solid $gray-200;
+  border-radius: $radius-sm;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+
+  &:hover { border-color: $gray-400; color: $gray-800; }
+}
+
+// ========= Loading dots =========
+.loading-dots {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+
+  span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: $navy-900;
+    animation: dot-blink 1.2s infinite;
+
+    &:nth-child(2) { animation-delay: .2s; }
+    &:nth-child(3) { animation-delay: .4s; }
+  }
+}
+
+@keyframes dot-blink {
+  0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+  40% { opacity: 1; transform: scale(1); }
+}
+
+// ========= Results section =========
+.results-section {
+  animation: fade-in .3s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}

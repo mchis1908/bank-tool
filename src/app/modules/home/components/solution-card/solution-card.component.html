@@ -1,0 +1,54 @@
+<div class="solution-card" [class.is-highlight]="highlight" [class.is-best-effort]="isBestEffort">
+
+  <!-- Main figures -->
+  <div class="card-top">
+    <div class="amount-block">
+      <span class="amount-value">{{ formatVND(solution.amount) }}</span>
+      <span class="amount-meta">{{ solution.term }} tháng · {{ formatRate(solution.interestRate) }}</span>
+    </div>
+    <div class="dbr-chip" [class]="'dbr-' + dbrStatus">
+      DBR {{ dbrPercent }}%
+    </div>
+  </div>
+
+  <!-- DBR bar -->
+  <div class="dbr-bar-wrap">
+    <div class="dbr-bar-track">
+      <div class="dbr-bar-fill" [class]="'fill-' + dbrStatus"
+        [style.width.%]="dbrFillPercent">
+      </div>
+      <div class="dbr-threshold-mark" [style.left.%]="(dbrThreshold / (dbrThreshold * 1.3)) * 100">
+        <span class="threshold-label">{{ dbrThreshold }}%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key metrics -->
+  <div class="metrics">
+    <div class="metric">
+      <span class="metric-label">Trả / tháng</span>
+      <span class="metric-value primary">{{ formatVND(solution.monthlyPayment) }}</span>
+    </div>
+    <div class="metric">
+      <span class="metric-label">Tổng lãi</span>
+      <span class="metric-value">{{ formatVND(solution.totalInterest) }}</span>
+    </div>
+  </div>
+
+  <!-- Status footer -->
+  <div class="card-footer" [class]="'footer-' + dbrStatus">
+    <span *ngIf="dbrStatus === 'ok'" class="status-icon">✓</span>
+    <span *ngIf="dbrStatus === 'warn'" class="status-icon">!</span>
+    <span *ngIf="dbrStatus === 'over'" class="status-icon">✕</span>
+    <span class="status-text" *ngIf="dbrStatus === 'ok'">DBR đạt — còn biên an toàn</span>
+    <span class="status-text" *ngIf="dbrStatus === 'warn'">DBR đạt nhưng gần ngưỡng</span>
+    <span class="status-text" *ngIf="dbrStatus === 'over'">DBR vượt ngưỡng cho phép</span>
+  </div>
+
+  <!-- Thêm vào cuối card, trước thẻ đóng </div> cuối -->
+  <div class="card-actions">
+    <button class="btn-schedule" (click)="openSchedule()">
+      Xem lịch trả nợ
+    </button>
+  </div>
+</div>
