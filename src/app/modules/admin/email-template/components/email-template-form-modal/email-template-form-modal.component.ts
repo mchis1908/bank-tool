@@ -89,7 +89,7 @@ export class EmailTemplateFormModalComponent implements OnInit, OnDestroy {
     const variables = this.templateService.extractVariables(value.body + ' ' + value.subject);
 
     const obs$ = this.isEditing
-      ? this.templateService.updateTemplate(this.template!.id, { ...value, variables })
+      ? this.templateService.updateTemplate(this.template!._id, { ...value, variables })
       : this.templateService.createTemplate({ ...value, variables });
 
     obs$.pipe(takeUntil(this.destroy$)).subscribe({

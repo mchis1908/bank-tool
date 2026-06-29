@@ -1,13 +1,13 @@
 // src/app/core/models/email-template.model.ts
 
 export interface EmailTemplate {
-  id: string;
+  _id: string;
   name: string;
   subject: string;
   body: string;
   variables: string[];
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export type EmailSendStatus = 'pending' | 'sending' | 'success' | 'fail';

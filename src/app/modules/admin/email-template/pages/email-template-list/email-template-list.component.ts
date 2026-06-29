@@ -109,7 +109,7 @@ export class EmailTemplateListComponent implements OnInit, OnDestroy {
   }
 
   private deleteTemplate(template: EmailTemplate): void {
-    this.templateService.deleteTemplate(template.id)
+    this.templateService.deleteTemplate(template._id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {

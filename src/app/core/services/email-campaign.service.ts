@@ -1,98 +1,73 @@
 // src/app/core/services/email-campaign.service.ts
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable, Subject, from } from 'rxjs';
 import { Customer } from '../models/customer.model';
 import { EmailTemplate } from '../models/email-template.model';
 import { EmailSendResult } from '../models/email-template.model';
 import { EmailTemplateService } from './email-template.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class EmailCampaignService {
 
-  constructor(private templateService: EmailTemplateService) {}
+  private readonly apiUrl = `${environment.apiUrl}/email`;
+
+  constructor(
+    private templateService: EmailTemplateService,
+    private http: HttpClient
+  ) {}
 
   /**
-   * Simulate gửi email theo từng khách hàng.
-   * Emit Observable<EmailSendResult> cho mỗi email được xử lý.
-   * Dùng Subject để stream từng kết quả.
+   * Gửi campaign thật qua backend → Resend API.
+   * Trả Observable<EmailSendResult> stream từng kết quả sau khi nhận response.
    */
   sendCampaign(
     template: EmailTemplate,
     customers: Customer[],
-    batchSize = 3
+    _batchSize = 3   // giữ signature cũ để không cần sửa component
   ): Observable<EmailSendResult> {
     const subject = new Subject<EmailSendResult>();
 
-    this.processBatch(template, customers, subject, batchSize);
+    const customerIds = customers
+      .filter(c => c._id)
+      .map(c => c._id as string);
+
+    // Khởi tạo pending cho tất cả
+    customers.forEach(c => {
+      subject.next({
+        customerId: c._id || '',
+        email: c.email,
+        fullname: c.fullname,
+        status: 'pending'
+      });
+    });
+
+    this.http.post<{ results: EmailSendResult[]; summary: any }>(
+      `${this.apiUrl}/send-campaign`,
+      { templateId: template._id, customerIds }
+    ).subscribe({
+      next: (res) => {
+        res.results.forEach(r => subject.next(r));
+        subject.complete();
+      },
+      error: (err) => {
+        // Nếu API lỗi hoàn toàn → đánh dấu tất cả fail
+        customers.forEach(c => {
+          subject.next({
+            customerId: c._id || '',
+            email: c.email,
+            fullname: c.fullname,
+            status: 'fail',
+            sentAt: new Date().toISOString(),
+            error: err?.error?.message || 'Lỗi kết nối server'
+          });
+        });
+        subject.complete();
+      }
+    });
 
     return subject.asObservable();
-  }
-
-  private async processBatch(
-    template: EmailTemplate,
-    customers: Customer[],
-    subject: Subject<EmailSendResult>,
-    batchSize: number
-  ): Promise<void> {
-    const batches: Customer[][] = [];
-    for (let i = 0; i < customers.length; i += batchSize) {
-      batches.push(customers.slice(i, i + batchSize));
-    }
-
-    for (const batch of batches) {
-      const promises = batch.map(customer =>
-        this.simulateSendEmail(template, customer)
-      );
-
-      const results = await Promise.all(
-        promises.map(async (p) => {
-          const result = await p;
-          subject.next(result);
-          return result;
-        })
-      );
-
-      // nhỏ delay giữa các batch
-      await this.sleep(300);
-    }
-
-    subject.complete();
-  }
-
-  private async simulateSendEmail(
-    template: EmailTemplate,
-    customer: Customer
-  ): Promise<EmailSendResult> {
-    // Simulate thời gian gửi: 400ms - 1500ms
-    const delay = 400 + Math.random() * 1100;
-    await this.sleep(delay);
-
-    // Simulate tỷ lệ thất bại ~15%
-    const isSuccess = Math.random() > 0.15;
-
-    const errorMessages = [
-      'Email address not found',
-      'SMTP connection timeout',
-      'Mailbox full',
-      'Invalid email format'
-    ];
-
-    const result: EmailSendResult = {
-      customerId: customer._id || '',
-      email: customer.email,
-      fullname: customer.fullname,
-      status: isSuccess ? 'success' : 'fail',
-      sentAt: new Date().toISOString(),
-      error: isSuccess
-        ? undefined
-        : errorMessages[Math.floor(Math.random() * errorMessages.length)]
-    };
-
-    return result;
-  }
-
-  private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   renderEmailBody(template: EmailTemplate, customer: Customer): string {

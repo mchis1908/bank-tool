@@ -54,10 +54,10 @@
       <div
         *ngFor="let tpl of templates"
         class="ec-template-card"
-        [class.ec-template-card--selected]="selectedTemplate?.id === tpl.id"
+        [class.ec-template-card--selected]="selectedTemplate?._id === tpl._id"
         (click)="selectTemplate(tpl)"
       >
-        <div class="ec-tc-check" *ngIf="selectedTemplate?.id === tpl.id">
+        <div class="ec-tc-check" *ngIf="selectedTemplate?._id === tpl._id">
           <span nz-icon nzType="check-circle" nzTheme="fill"></span>
         </div>
         <div class="ec-tc-icon">📧</div>
