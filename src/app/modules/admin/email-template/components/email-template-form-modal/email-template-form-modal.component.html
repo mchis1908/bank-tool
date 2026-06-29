@@ -1,0 +1,119 @@
+<!-- email-template-form-modal.component.html -->
+<form [formGroup]="form" class="etf-form">
+
+  <nz-alert
+    *ngIf="!isEditing"
+    nzType="info"
+    nzMessage="Sử dụng biến {{ '{' + '{' }}fullname{{ '}' + '}' }}, {{ '{' + '{' }}email{{ '}' + '}' }}, {{ '{' + '{' }}phone{{ '}' + '}' }}, {{ '{' + '{' }}company{{ '}' + '}' }}, {{ '{' + '{' }}province{{ '}' + '}' }} để cá nhân hoá nội dung"
+    [nzShowIcon]="true"
+    class="etf-alert"
+  ></nz-alert>
+
+  <div class="etf-layout">
+    <!-- LEFT: Form fields -->
+    <div class="etf-left">
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="24" nzRequired>Tên template</nz-form-label>
+        <nz-form-control [nzSpan]="24" nzErrorTip="Vui lòng nhập tên template">
+          <input nz-input formControlName="name" placeholder="VD: Chào mừng khách hàng mới" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="24" nzRequired>Tiêu đề email (Subject)</nz-form-label>
+        <nz-form-control [nzSpan]="24" nzErrorTip="Vui lòng nhập tiêu đề email">
+          <input nz-input formControlName="subject" placeholder="VD: Chào mừng {{ '{' + '{' }}fullname{{ '}' + '}' }} đến với Shinhan Bank!" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <!-- Variable insertion -->
+      <div class="etf-var-section">
+        <label class="etf-var-label">Chèn biến vào nội dung:</label>
+        <div class="etf-var-chips">
+          <button
+            *ngFor="let v of availableVars"
+            type="button"
+            class="etf-var-chip"
+            (click)="insertVariable(v)"
+            nz-tooltip
+            [nzTooltipTitle]="'Chèn {{' + v + '}}'"
+          >
+            {{ '{{' + v + '}}' }}
+          </button>
+        </div>
+      </div>
+
+      <nz-form-item>
+        <nz-form-label [nzSpan]="24" nzRequired>Nội dung email</nz-form-label>
+        <nz-form-control [nzSpan]="24" nzErrorTip="Vui lòng nhập nội dung (tối thiểu 10 ký tự)">
+          <textarea
+            nz-input
+            formControlName="body"
+            placeholder="Nhập nội dung email..."
+            [nzAutosize]="{ minRows: 10, maxRows: 18 }"
+            class="etf-textarea"
+          ></textarea>
+        </nz-form-control>
+      </nz-form-item>
+
+    </div>
+
+    <!-- RIGHT: Preview -->
+    <div class="etf-right">
+      <div class="etf-preview-panel">
+        <div class="etf-preview-header">
+          <span class="etf-preview-badge">PREVIEW</span>
+          <span class="etf-preview-note">Xem với dữ liệu mẫu</span>
+        </div>
+
+        <div class="etf-preview-email">
+          <div class="etf-preview-top">
+            <div class="etf-dot-row">
+              <span class="etf-dot red"></span>
+              <span class="etf-dot yellow"></span>
+              <span class="etf-dot green"></span>
+            </div>
+          </div>
+
+          <div class="etf-preview-to">
+            <span class="etf-preview-field-name">Đến:</span>
+            <span>nguyenvana&#64;example.com</span>
+          </div>
+          <div class="etf-preview-from">
+            <span class="etf-preview-field-name">Từ:</span>
+            <span>noreply&#64;shb.com.vn</span>
+          </div>
+          <div class="etf-preview-subject-row">
+            <span class="etf-preview-field-name">Tiêu đề:</span>
+            <strong>{{ previewSubject || '(Chưa có tiêu đề)' }}</strong>
+          </div>
+
+          <nz-divider></nz-divider>
+
+          <div
+            class="etf-preview-body-content"
+            [innerHTML]="previewBodyHtml || '<span style=\'color:#ccc\'>(Chưa có nội dung)</span>'"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer actions -->
+  <div class="etf-footer">
+    <button nz-button type="button" (click)="cancel()">Huỷ</button>
+    <button
+      nz-button
+      nzType="primary"
+      type="submit"
+      [nzLoading]="isSaving"
+      (click)="submit()"
+    >
+      <span nz-icon nzType="save"></span>
+      {{ isEditing ? 'Lưu thay đổi' : 'Tạo template' }}
+    </button>
+  </div>
+
+</form>

@@ -1,0 +1,156 @@
+<!-- src/app/modules/admin/customer/components/customer-import/customer-import.component.html -->
+<div class="import-wizard">
+
+  <nz-steps [nzCurrent]="currentStep" class="steps-bar">
+    <nz-step nzTitle="Tải file & Kiểm tra dữ liệu"></nz-step>
+    <nz-step nzTitle="Xử lý trùng lặp"></nz-step>
+    <nz-step nzTitle="Kết quả"></nz-step>
+  </nz-steps>
+
+  <!-- ================= STEP 0: UPLOAD + VALIDATE ================= -->
+  <div class="step-content" *ngIf="currentStep === 0">
+
+    <nz-upload
+      *ngIf="rows.length === 0"
+      [nzBeforeUpload]="beforeUpload"
+      [nzShowUploadList]="false"
+      accept=".xlsx,.xls">
+      <button nz-button [nzLoading]="parsing">
+        <i nz-icon nzType="upload"></i> Chọn file Excel
+      </button>
+    </nz-upload>
+
+    <p class="hint-text" *ngIf="rows.length === 0">
+      File cần có cột: Họ tên, Email, SĐT, Công ty, Lương, Tỉnh thành, Ghi chú (không phân biệt thứ tự cột)
+    </p>
+
+    <div *ngIf="rows.length > 0">
+      <div class="summary-chips">
+        <span class="chip chip-total">{{ rows.length }} dòng đã đọc</span>
+        <span class="chip chip-valid">{{ validRowsCount }} hợp lệ</span>
+        <span class="chip chip-invalid" *ngIf="invalidRowsCount > 0">{{ invalidRowsCount }} lỗi</span>
+        <button nz-button nzType="text" nzSize="small" (click)="backToUpload()">Chọn file khác</button>
+      </div>
+
+      <div class="row-table-wrap">
+        <table class="row-table">
+          <thead>
+            <tr>
+              <th>Dòng</th>
+              <th>Họ tên</th>
+              <th>Email</th>
+              <th>SĐT</th>
+              <th>Trạng thái</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of rows" [class.row-error]="row.validationErrors.length > 0">
+              <td>{{ row.rowIndex }}</td>
+              <td>{{ row.data.fullname || '—' }}</td>
+              <td>{{ row.data.email || '—' }}</td>
+              <td>{{ row.data.phone || '—' }}</td>
+              <td>
+                <span *ngIf="row.validationErrors.length === 0" class="status-ok">✓ Hợp lệ</span>
+                <span *ngIf="row.validationErrors.length > 0" class="status-error">
+                  {{ row.validationErrors.join(', ') }}
+                </span>
+              </td>
+              <td>
+                <button nz-button nzType="text" nzSize="small" nzDanger (click)="removeRow(row)">
+                  <i nz-icon nzType="delete"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="step-actions">
+        <button
+          nz-button nzType="primary"
+          [nzLoading]="checkingDuplicates"
+          [disabled]="validRowsCount === 0"
+          (click)="goToCheckDuplicates()">
+          Tiếp tục ({{ validRowsCount }} dòng hợp lệ)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= STEP 1: XỬ LÝ TRÙNG LẶP ================= -->
+  <div class="step-content" *ngIf="currentStep === 1">
+
+    <div class="summary-chips">
+      <span class="chip chip-total">{{ newCount }} khách hàng mới</span>
+      <span class="chip chip-duplicate" *ngIf="duplicateCount > 0">{{ duplicateCount }} trùng email</span>
+    </div>
+
+    <div class="row-table-wrap" *ngIf="duplicateCount > 0">
+      <p class="hint-text">Các dòng dưới đây có email đã tồn tại trong hệ thống. Chọn hành động cho từng dòng:</p>
+
+      <table class="row-table">
+        <thead>
+          <tr>
+            <th>Họ tên (file mới)</th>
+            <th>Email</th>
+            <th>Khách hàng hiện có</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of rows" [hidden]="!row.isDuplicate">
+            <td>{{ row.data.fullname }}</td>
+            <td>{{ row.data.email }}</td>
+            <td class="existing-info">
+              {{ row.existingCustomer?.fullname }}<br>
+              <span class="existing-meta">Cập nhật: {{ row.existingCustomer?.updated_at | date:'dd/MM/yyyy' }}</span>
+            </td>
+            <td>
+              <nz-select [(ngModel)]="row.action" class="action-select">
+                <nz-option nzValue="skip" nzLabel="Bỏ qua (giữ dữ liệu cũ)"></nz-option>
+                <nz-option nzValue="update" nzLabel="Cập nhật đè dữ liệu mới"></nz-option>
+                <nz-option nzValue="create" nzLabel="Vẫn tạo mới (tạo bản ghi riêng)"></nz-option>
+              </nz-select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="hint-text" *ngIf="duplicateCount === 0">
+      Không có dòng nào trùng email. Tất cả {{ newCount }} khách hàng sẽ được tạo mới.
+    </p>
+
+    <div class="step-actions">
+      <button nz-button (click)="currentStep = 0">Quay lại</button>
+      <button nz-button nzType="primary" [nzLoading]="importing" (click)="goToImport()">
+        Xác nhận Import
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= STEP 2: KẾT QUẢ ================= -->
+  <div class="step-content" *ngIf="currentStep === 2 && importResult">
+    <nz-alert
+      nzType="success"
+      nzShowIcon
+      nzMessage="Import hoàn tất"
+      [nzDescription]="
+        'Đã tạo mới ' + importResult.created + ' | Cập nhật ' + importResult.updated + ' | Bỏ qua ' + importResult.skipped
+      ">
+    </nz-alert>
+
+    <div class="error-list" *ngIf="importResult.errors.length > 0">
+      <p class="hint-text">Một số dòng gặp lỗi khi import:</p>
+      <ul>
+        <li *ngFor="let err of importResult.errors">{{ err.email || '(không rõ email)' }}: {{ err.message }}</li>
+      </ul>
+    </div>
+
+    <div class="step-actions">
+      <button nz-button nzType="primary" (click)="finish()">Hoàn tất</button>
+    </div>
+  </div>
+
+</div>

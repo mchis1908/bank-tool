@@ -1,0 +1,30 @@
+<!-- src/app/modules/admin/layout/admin-layout.component.html -->
+<div class="admin-layout">
+
+  <aside class="admin-sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-mark">Shinhan Bank</span>
+      <span class="brand-text">Admin</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a *ngFor="let item of navItems" [routerLink]="item.disabled ? null : item.routerLink"
+        routerLinkActive="nav-item-active" [class.nav-item-disabled]="item.disabled" class="nav-item">
+        <span class="nav-icon">{{ item.icon }}</span>
+        <span class="nav-label">{{ item.label }}</span>
+        <span class="nav-soon" *ngIf="item.disabled">Sắp ra mắt</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button nz-button nzType="default" nzBlock (click)="logout()">
+        Đăng xuất
+      </button>
+    </div>
+  </aside>
+
+  <main class="admin-content">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>

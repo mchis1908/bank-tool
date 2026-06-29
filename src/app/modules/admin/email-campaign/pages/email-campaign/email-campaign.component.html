@@ -1,0 +1,517 @@
+<!-- email-campaign.component.html -->
+<div class="ec-page">
+
+  <!-- Page Header -->
+  <div class="ec-header">
+    <div class="ec-header-left">
+      <h1 class="ec-title">
+        <span class="ec-title-icon">📧</span>
+        Gửi Email Chiến dịch
+      </h1>
+      <p class="ec-subtitle">Tạo chiến dịch email gửi đến khách hàng theo từng bước</p>
+    </div>
+    <button
+      *ngIf="campaignPhase === 'done'"
+      nz-button nzType="default" nzSize="large"
+      class="ec-btn-new"
+      (click)="resetCampaign()"
+    >
+      <span nz-icon nzType="reload"></span>
+      Tạo chiến dịch mới
+    </button>
+  </div>
+
+  <!-- Steps Indicator -->
+  <div class="ec-steps-wrapper">
+    <nz-steps [nzCurrent]="currentStep" nzSize="small" class="ec-steps">
+      <nz-step nzTitle="Chọn Template" nzDescription="Mẫu email" nzIcon="file-text"></nz-step>
+      <nz-step nzTitle="Chọn Khách hàng" nzDescription="Danh sách gửi" nzIcon="team"></nz-step>
+      <nz-step nzTitle="Gửi & Kết quả" nzDescription="Xem tiến trình" nzIcon="send"></nz-step>
+    </nz-steps>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- STEP 0: Choose Template -->
+  <!-- ============================================================ -->
+  <div *ngIf="currentStep === 0" class="ec-step-content">
+
+    <div class="ec-section-header">
+      <h2 class="ec-section-title">Chọn mẫu email</h2>
+      <p class="ec-section-sub">Chọn template sẽ được gửi đến khách hàng</p>
+    </div>
+
+    <nz-spin *ngIf="isLoadingTemplates" nzTip="Đang tải template..." class="ec-loading"></nz-spin>
+
+    <div *ngIf="!isLoadingTemplates && templates.length === 0" class="ec-empty-box">
+      <nz-empty nzNotFoundContent="Chưa có template nào">
+        <ng-template #nzFooter>
+          <a routerLink="/admin/email-template" nz-button nzType="primary">Tạo template ngay</a>
+        </ng-template>
+      </nz-empty>
+    </div>
+
+    <div *ngIf="!isLoadingTemplates && templates.length > 0" class="ec-template-grid">
+      <div
+        *ngFor="let tpl of templates"
+        class="ec-template-card"
+        [class.ec-template-card--selected]="selectedTemplate?.id === tpl.id"
+        (click)="selectTemplate(tpl)"
+      >
+        <div class="ec-tc-check" *ngIf="selectedTemplate?.id === tpl.id">
+          <span nz-icon nzType="check-circle" nzTheme="fill"></span>
+        </div>
+        <div class="ec-tc-icon">📧</div>
+        <h3 class="ec-tc-name">{{ tpl.name }}</h3>
+        <p class="ec-tc-subject">{{ tpl.subject }}</p>
+        <p class="ec-tc-preview">{{ tpl.body | slice:0:100 }}{{ tpl.body.length > 100 ? '...' : '' }}</p>
+        <div class="ec-tc-vars">
+          <nz-tag *ngFor="let v of tpl.variables" nzColor="purple" class="ec-tag-small">
+            {{ '{{' + v + '}}' }}
+          </nz-tag>
+        </div>
+      </div>
+    </div>
+
+    <div class="ec-step-nav">
+      <div></div>
+      <button
+        nz-button nzType="primary" nzSize="large"
+        [disabled]="!selectedTemplate"
+        (click)="nextStep()"
+        class="ec-btn-next"
+      >
+        Tiếp theo: Chọn khách hàng
+        <span nz-icon nzType="arrow-right"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- STEP 1: Choose Customers -->
+  <!-- ============================================================ -->
+  <div *ngIf="currentStep === 1" class="ec-step-content">
+
+    <div class="ec-two-col">
+
+      <!-- LEFT: Customer list -->
+      <div class="ec-customer-panel">
+        <div class="ec-section-header">
+          <h2 class="ec-section-title">Chọn khách hàng</h2>
+          <nz-badge [nzCount]="selectedCount" nzShowZero>
+            <span class="ec-sel-count-label">đã chọn</span>
+          </nz-badge>
+        </div>
+
+        <!-- Filters -->
+        <div class="ec-filters">
+          <input
+            nz-input
+            placeholder="🔍 Tìm theo tên hoặc email..."
+            [(ngModel)]="searchText"
+            (ngModelChange)="applyFilter()"
+            class="ec-search"
+          />
+          <nz-select
+            [(ngModel)]="filterStatus"
+            (ngModelChange)="applyFilter()"
+            class="ec-status-filter"
+            nzPlaceHolder="Lọc trạng thái"
+          >
+            <nz-option *ngFor="let opt of statusOptions" [nzValue]="opt.value" [nzLabel]="opt.label"></nz-option>
+          </nz-select>
+        </div>
+
+        <div class="ec-table-wrap">
+          <nz-spin *ngIf="isLoadingCustomers" nzTip="Đang tải..."></nz-spin>
+
+          <nz-table
+            *ngIf="!isLoadingCustomers"
+            #customerTable
+            [nzData]="filteredCustomers"
+            nzSize="small"
+            [nzScroll]="{ y: '380px' }"
+            [nzShowPagination]="false"
+            class="ec-customer-table"
+          >
+            <thead>
+              <tr>
+                <th nzWidth="40px">
+                  <label
+                    nz-checkbox
+                    [ngModel]="isAllVisibleSelected"
+                    [nzIndeterminate]="isIndeterminate"
+                    (ngModelChange)="selectAllVisible($event)"
+                  ></label>
+                </th>
+                <th>Khách hàng</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of customerTable.data">
+                <td>
+                  <label
+                    nz-checkbox
+                    [ngModel]="selectedCustomerIds.has(c._id!)"
+                    (ngModelChange)="toggleCustomer(c._id!, $event)"
+                  ></label>
+                </td>
+                <td>
+                  <div class="ec-cust-info">
+                    <span class="ec-cust-name">{{ c.fullname }}</span>
+                    <span class="ec-cust-email">{{ c.email }}</span>
+                  </div>
+                </td>
+                <td>
+                  <nz-tag [nzColor]="getStatusColor(c.status)" class="ec-tag-small">
+                    {{ getStatusLabel(c.status) }}
+                  </nz-tag>
+                </td>
+              </tr>
+              <tr *ngIf="filteredCustomers.length === 0">
+                <td colspan="3">
+                  <nz-empty nzNotFoundContent="Không có khách hàng nào"></nz-empty>
+                </td>
+              </tr>
+            </tbody>
+          </nz-table>
+        </div>
+
+        <p class="ec-count-info">
+          Hiển thị {{ filteredCustomers.length }} / {{ customers.length }} khách hàng
+          &bull; Đã chọn <strong>{{ selectedCount }}</strong>
+        </p>
+      </div>
+
+      <!-- RIGHT: Preview -->
+      <div class="ec-preview-panel">
+        <div class="ec-preview-header">
+          <span class="ec-preview-badge">PREVIEW EMAIL</span>
+          <span class="ec-preview-note">Với dữ liệu của khách đầu tiên được chọn</span>
+        </div>
+
+        <div *ngIf="!previewCustomer" class="ec-preview-placeholder">
+          <span class="ec-preview-icon">💌</span>
+          <p>Chọn ít nhất 1 khách hàng để xem preview email</p>
+        </div>
+
+        <div *ngIf="previewCustomer" class="ec-preview-email-box">
+          <div class="ec-prev-dots">
+            <span class="ec-dot r"></span>
+            <span class="ec-dot y"></span>
+            <span class="ec-dot g"></span>
+          </div>
+          <div class="ec-prev-field">
+            <span class="ec-prev-label">Đến:</span>
+            <span class="ec-prev-val">{{ previewCustomer.email }}</span>
+          </div>
+          <div class="ec-prev-field">
+            <span class="ec-prev-label">Tên:</span>
+            <span class="ec-prev-val">{{ previewCustomer.fullname }}</span>
+          </div>
+          <div class="ec-prev-field">
+            <span class="ec-prev-label">Tiêu đề:</span>
+            <strong class="ec-prev-subject">{{ previewSubject }}</strong>
+          </div>
+          <nz-divider></nz-divider>
+          <div class="ec-prev-body" [innerHTML]="previewBodyHtml"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ec-step-nav">
+      <button nz-button nzSize="large" (click)="prevStep()">
+        <span nz-icon nzType="arrow-left"></span>
+        Quay lại
+      </button>
+      <button
+        nz-button nzType="primary" nzSize="large"
+        [disabled]="selectedCount === 0"
+        (click)="nextStep()"
+        class="ec-btn-next"
+      >
+        Tiếp theo: Gửi email ({{ selectedCount }} người)
+        <span nz-icon nzType="arrow-right"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- STEP 2: Send & Results -->
+  <!-- ============================================================ -->
+  <div *ngIf="currentStep === 2" class="ec-step-content">
+
+    <!-- IDLE: Confirmation before send -->
+    <div *ngIf="campaignPhase === 'idle'" class="ec-send-confirm">
+      <div class="ec-confirm-card">
+        <div class="ec-confirm-icon">🚀</div>
+        <h2 class="ec-confirm-title">Sẵn sàng gửi chiến dịch!</h2>
+        <p class="ec-confirm-sub">Xem lại thông tin trước khi gửi</p>
+
+        <div class="ec-confirm-info">
+          <div class="ec-info-row">
+            <span class="ec-info-label">📝 Template</span>
+            <span class="ec-info-value">{{ selectedTemplate?.name }}</span>
+          </div>
+          <div class="ec-info-row">
+            <span class="ec-info-label">📧 Tiêu đề</span>
+            <span class="ec-info-value">{{ selectedTemplate?.subject }}</span>
+          </div>
+          <div class="ec-info-row">
+            <span class="ec-info-label">👥 Số người nhận</span>
+            <span class="ec-info-value ec-highlight">{{ selectedCount }} khách hàng</span>
+          </div>
+        </div>
+
+        <div class="ec-confirm-actions">
+          <button nz-button nzSize="large" (click)="prevStep()">
+            <span nz-icon nzType="arrow-left"></span> Quay lại
+          </button>
+          <button
+            nz-button nzType="primary" nzSize="large"
+            class="ec-btn-send"
+            (click)="startSendCampaign()"
+          >
+            <span nz-icon nzType="send"></span>
+            Gửi ngay {{ selectedCount }} email
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SENDING: Progress -->
+    <div *ngIf="campaignPhase === 'sending'" class="ec-sending-panel">
+      <div class="ec-sending-header">
+        <div class="ec-sending-anim">
+          <span class="ec-pulse"></span>
+          <span class="ec-sending-text">Đang gửi email...</span>
+        </div>
+        <div class="ec-sending-counter">
+          <span class="ec-counter-done">{{ summary.success + summary.fail }}</span>
+          <span class="ec-counter-sep">/</span>
+          <span class="ec-counter-total">{{ summary.total }}</span>
+        </div>
+      </div>
+
+      <div class="ec-progress-wrap">
+        <nz-progress
+          [nzPercent]="progressPercent"
+          nzStatus="active"
+          [nzStrokeWidth]="12"
+          nzStrokeColor="{ '0%': '#6c63ff', '100%': '#a855f7' }"
+        ></nz-progress>
+      </div>
+
+      <div class="ec-stats-mini">
+        <div class="ec-stat-mini success">
+          <span class="ec-stat-mini-num">{{ summary.success }}</span>
+          <span class="ec-stat-mini-label">✅ Thành công</span>
+        </div>
+        <div class="ec-stat-mini fail">
+          <span class="ec-stat-mini-num">{{ summary.fail }}</span>
+          <span class="ec-stat-mini-label">❌ Thất bại</span>
+        </div>
+        <div class="ec-stat-mini pending">
+          <span class="ec-stat-mini-num">{{ summary.pending }}</span>
+          <span class="ec-stat-mini-label">⏳ Đang chờ</span>
+        </div>
+      </div>
+
+      <!-- Live table -->
+      <div class="ec-live-table">
+        <div class="ec-live-table-title">Tiến trình gửi real-time</div>
+        <nz-table
+          [nzData]="sendResults"
+          nzSize="small"
+          [nzScroll]="{ y: '260px' }"
+          [nzShowPagination]="false"
+          class="ec-result-table"
+        >
+          <thead>
+            <tr>
+              <th>Khách hàng</th>
+              <th>Email</th>
+              <th nzWidth="130px">Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of sendResults" [class.ec-row-success]="r.status === 'success'" [class.ec-row-fail]="r.status === 'fail'">
+              <td>{{ r.fullname }}</td>
+              <td>{{ r.email }}</td>
+              <td>
+                <span class="ec-status-badge" [ngClass]="'ec-status-' + r.status">
+                  <ng-container [ngSwitch]="r.status">
+                    <span *ngSwitchCase="'pending'">⏳ Đang chờ</span>
+                    <span *ngSwitchCase="'sending'">🔄 Đang gửi</span>
+                    <span *ngSwitchCase="'success'">✅ Thành công</span>
+                    <span *ngSwitchCase="'fail'">❌ Thất bại</span>
+                  </ng-container>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </div>
+    </div>
+
+    <!-- DONE: Summary + Retry -->
+    <div *ngIf="campaignPhase === 'done'" class="ec-done-panel">
+
+      <!-- Summary Cards -->
+      <div class="ec-summary-cards">
+        <div class="ec-sum-card total">
+          <div class="ec-sum-icon">📊</div>
+          <div class="ec-sum-num">{{ summary.total }}</div>
+          <div class="ec-sum-label">Tổng cộng</div>
+        </div>
+        <div class="ec-sum-card success">
+          <div class="ec-sum-icon">✅</div>
+          <div class="ec-sum-num">{{ summary.success }}</div>
+          <div class="ec-sum-label">Thành công</div>
+          <div class="ec-sum-pct">{{ summary.total > 0 ? (summary.success / summary.total * 100 | number:'1.0-0') : 0 }}%</div>
+        </div>
+        <div class="ec-sum-card fail">
+          <div class="ec-sum-icon">❌</div>
+          <div class="ec-sum-num">{{ summary.fail }}</div>
+          <div class="ec-sum-label">Thất bại</div>
+          <div class="ec-sum-pct">{{ summary.total > 0 ? (summary.fail / summary.total * 100 | number:'1.0-0') : 0 }}%</div>
+        </div>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="ec-result-header">
+        <h3 class="ec-result-title">Bảng thống kê kết quả</h3>
+        <div class="ec-result-filters">
+          <button
+            nz-button
+            [nzType]="resultFilter === 'all' ? 'primary' : 'default'"
+            nzSize="small"
+            (click)="resultFilter = 'all'"
+          >Tất cả ({{ summary.total }})</button>
+          <button
+            nz-button
+            [nzType]="resultFilter === 'success' ? 'primary' : 'default'"
+            nzSize="small"
+            class="ec-btn-success"
+            (click)="resultFilter = 'success'"
+          >✅ Thành công ({{ summary.success }})</button>
+          <button
+            nz-button
+            [nzType]="resultFilter === 'fail' ? 'primary' : 'default'"
+            nzSize="small"
+            class="ec-btn-fail"
+            (click)="resultFilter = 'fail'"
+          >❌ Thất bại ({{ summary.fail }})</button>
+        </div>
+      </div>
+
+      <!-- Result Table with Retry checkboxes -->
+      <div class="ec-result-table-wrap">
+        <nz-table
+          [nzData]="filteredResults"
+          nzSize="small"
+          [nzScroll]="{ y: '300px' }"
+          [nzShowPagination]="false"
+          class="ec-result-table"
+        >
+          <thead>
+            <tr>
+              <th nzWidth="44px" *ngIf="resultFilter !== 'success'">
+                <label
+                  nz-checkbox
+                  [ngModel]="isAllRetrySelected"
+                  [nzIndeterminate]="isRetryIndeterminate"
+                  (ngModelChange)="toggleAllRetry($event)"
+                  nz-tooltip
+                  nzTooltipTitle="Chọn tất cả email thất bại để gửi lại"
+                ></label>
+              </th>
+              <th *ngIf="resultFilter === 'success'"></th>
+              <th>Khách hàng</th>
+              <th>Email</th>
+              <th nzWidth="130px">Kết quả</th>
+              <th>Lý do thất bại</th>
+              <th nzWidth="100px">Thời gian</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let r of filteredResults"
+              [class.ec-row-success]="r.status === 'success'"
+              [class.ec-row-fail]="r.status === 'fail'"
+              [class.ec-row-pending]="r.status === 'pending'"
+            >
+              <td>
+                <label
+                  *ngIf="r.status === 'fail'"
+                  nz-checkbox
+                  [ngModel]="selectedForRetry.has(r.email)"
+                  (ngModelChange)="toggleRetrySelect(r.email, $event)"
+                ></label>
+              </td>
+              <td>{{ r.fullname }}</td>
+              <td>{{ r.email }}</td>
+              <td>
+                <span class="ec-status-badge" [ngClass]="'ec-status-' + r.status">
+                  <ng-container [ngSwitch]="r.status">
+                    <span *ngSwitchCase="'success'">✅ Thành công</span>
+                    <span *ngSwitchCase="'fail'">❌ Thất bại</span>
+                    <span *ngSwitchCase="'pending'">⏳ Đang chờ</span>
+                  </ng-container>
+                </span>
+              </td>
+              <td>
+                <span class="ec-error-text" *ngIf="r.error">{{ r.error }}</span>
+                <span class="ec-dash" *ngIf="!r.error">—</span>
+              </td>
+              <td>
+                <span class="ec-time" *ngIf="r.sentAt">
+                  {{ r.sentAt | date:'HH:mm:ss' }}
+                </span>
+                <span class="ec-dash" *ngIf="!r.sentAt">—</span>
+              </td>
+            </tr>
+            <tr *ngIf="filteredResults.length === 0">
+              <td colspan="6">
+                <nz-empty nzNotFoundContent="Không có kết quả nào"></nz-empty>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </div>
+
+      <!-- Retry Panel -->
+      <div class="ec-retry-panel" *ngIf="failedResults.length > 0">
+        <nz-divider></nz-divider>
+
+        <div *ngIf="isRetryDone" class="ec-retry-done">
+          <nz-alert
+            nzType="success"
+            [nzMessage]="'Gửi lại hoàn tất! ' + retryResults.length + ' email đã được thử lại.'"
+            nzShowIcon
+          ></nz-alert>
+        </div>
+
+        <div class="ec-retry-actions">
+          <div class="ec-retry-info">
+            <span nz-icon nzType="warning" nzTheme="fill" class="ec-retry-warn-icon"></span>
+            <span>Có <strong>{{ failedResults.length }}</strong> email thất bại. Tick chọn và gửi lại:</span>
+          </div>
+          <button
+            nz-button nzType="primary"
+            nzDanger
+            nzSize="large"
+            [disabled]="retryCount === 0 || isRetrying"
+            [nzLoading]="isRetrying"
+            (click)="retrySend()"
+            class="ec-btn-retry"
+          >
+            <span nz-icon nzType="redo"></span>
+            Gửi lại {{ retryCount > 0 ? '(' + retryCount + ')' : '' }} email đã chọn
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,227 @@
+.et-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0c29 0%, #1a1a4e 40%, #111130 100%);
+  padding: 32px;
+  color: #fff;
+}
+
+/* Header */
+.et-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.et-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: -0.5px;
+}
+
+.et-title-icon {
+  font-size: 32px;
+}
+
+.et-subtitle {
+  color: rgba(255,255,255,0.55);
+  margin: 0;
+  font-size: 14px;
+}
+
+.et-btn-create {
+  background: linear-gradient(135deg, #6c63ff, #a855f7) !important;
+  border: none !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  height: 44px !important;
+  padding: 0 24px !important;
+  box-shadow: 0 4px 20px rgba(108, 99, 255, 0.4) !important;
+  transition: all 0.3s ease !important;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(108, 99, 255, 0.6) !important;
+  }
+}
+
+/* Loading / Empty */
+.et-loading,
+.et-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+/* Grid */
+.et-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+}
+
+/* Card */
+.et-card {
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  &:hover {
+    transform: translateY(-4px);
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(108,99,255,0.5);
+    box-shadow: 0 12px 40px rgba(108,99,255,0.2);
+  }
+}
+
+.et-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.et-card-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, rgba(108,99,255,0.3), rgba(168,85,247,0.3));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  border: 1px solid rgba(108,99,255,0.4);
+  flex-shrink: 0;
+}
+
+.et-card-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.et-card-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.et-card-date {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  margin: 0;
+}
+
+.et-card-subject {
+  background: rgba(108,99,255,0.15);
+  border-left: 3px solid #6c63ff;
+  border-radius: 0 8px 8px 0;
+  padding: 8px 12px;
+  font-size: 13px;
+
+  .et-label {
+    color: rgba(255,255,255,0.5);
+    margin-right: 6px;
+  }
+
+  .et-value {
+    color: rgba(255,255,255,0.9);
+    font-style: italic;
+  }
+}
+
+.et-card-body-preview {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.6;
+  flex: 1;
+}
+
+.et-card-vars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.et-var-tag {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  border-radius: 4px;
+}
+
+.et-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 14px;
+}
+
+/* Preview Modal */
+.et-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.et-preview-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.et-preview-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(0,0,0,0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.et-preview-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a4e;
+  margin: 0;
+}
+
+.et-preview-subject {
+  font-size: 14px;
+  color: #1a1a4e;
+  background: #f5f5ff;
+  border: 1px solid #d0d0ff;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 0;
+  font-weight: 500;
+}
+
+.et-preview-body {
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 16px 20px;
+  font-size: 14px;
+  color: #333;
+  line-height: 1.7;
+  font-family: 'Courier New', monospace;
+  max-height: 350px;
+  overflow-y: auto;
+}

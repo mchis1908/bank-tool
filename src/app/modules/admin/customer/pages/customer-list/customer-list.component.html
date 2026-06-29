@@ -1,0 +1,82 @@
+<!-- src/app/modules/admin/customer/pages/customer-list/customer-list.component.html -->
+<div class="customer-list-page">
+
+  <div class="page-header">
+    <h2 class="page-title">Quản lý khách hàng</h2>
+    <div class="page-actions">
+      <button nz-button (click)="openImportModal()">
+        <i nz-icon nzType="upload"></i> Import Excel
+      </button>
+      <button nz-button nzType="primary" (click)="openCreateModal()">
+        <i nz-icon nzType="plus"></i> Thêm khách hàng
+      </button>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <input
+      nz-input
+      placeholder="Tìm theo tên, email, SĐT..."
+      [(ngModel)]="search"
+      (ngModelChange)="onSearchChange($event)"
+      class="search-input">
+
+    <nz-select
+      [(ngModel)]="statusFilter"
+      (ngModelChange)="onStatusFilterChange()"
+      nzAllowClear
+      nzPlaceHolder="Tất cả trạng thái"
+      class="status-filter">
+      <nz-option *ngFor="let s of statusOptions" [nzValue]="s.value" [nzLabel]="s.label"></nz-option>
+    </nz-select>
+  </div>
+
+  <nz-table
+    [nzData]="customers"
+    [nzLoading]="loading"
+    [nzFrontPagination]="false"
+    [nzTotal]="total"
+    [nzPageIndex]="page"
+    [nzPageSize]="limit"
+    (nzPageIndexChange)="onPageChange($event)"
+    nzSize="middle">
+    <thead>
+      <tr>
+        <th>Họ tên</th>
+        <th>Email</th>
+        <th>SĐT</th>
+        <th>Công ty</th>
+        <th>Thu nhập</th>
+        <th>Tỉnh/TP</th>
+        <th>Trạng thái</th>
+        <th nzWidth="100px"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of customers">
+        <td>{{ c.fullname }}</td>
+        <td>{{ c.email }}</td>
+        <td>{{ c.phone || '—' }}</td>
+        <td>{{ c.company || '—' }}</td>
+        <td>{{ formatIncome(c.income) }}</td>
+        <td>{{ c.province || '—' }}</td>
+        <td>
+          <nz-tag [nzColor]="statusColor(c.status)">{{ statusLabels[c.status] }}</nz-tag>
+        </td>
+        <td>
+          <button nz-button nzType="text" nzSize="small" (click)="openEditModal(c)">
+            <i nz-icon nzType="edit"></i>
+          </button>
+          <button
+            nz-button nzType="text" nzSize="small" nzDanger
+            nz-popconfirm
+            nzPopconfirmTitle="Xoá khách hàng này?"
+            (nzOnConfirm)="deleteCustomer(c)">
+            <i nz-icon nzType="delete"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+
+</div>

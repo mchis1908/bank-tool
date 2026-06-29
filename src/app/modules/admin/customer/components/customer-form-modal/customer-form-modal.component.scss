@@ -1,0 +1,46 @@
+// src/app/modules/admin/customer/components/customer-form-modal/customer-form-modal.component.scss
+.customer-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.form-row-group {
+  display: flex;
+  gap: 12px;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #444;
+}
+
+.required {
+  color: #e74c3c;
+}
+
+.form-error {
+  font-size: 12px;
+  color: #e74c3c;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 14px;
+  border-top: 1px solid #f0f0f0;
+}

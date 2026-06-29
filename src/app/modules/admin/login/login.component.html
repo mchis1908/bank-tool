@@ -1,0 +1,50 @@
+<div class="login-page">
+
+  <div class="login-card">
+
+    <div class="logo-section">
+      <div class="logo-circle">
+        Shinhan Bank
+      </div>
+
+      <h2>Shinhan Admin</h2>
+
+      <p>Đăng nhập hệ thống quản trị</p>
+    </div>
+
+    <form (ngSubmit)="login()">
+
+      <nz-input-group nzPrefixIcon="user">
+        <input
+          nz-input
+          placeholder="Tên đăng nhập"
+          [(ngModel)]="username"
+          name="username">
+      </nz-input-group>
+
+      <div class="mt-3"></div>
+
+      <nz-input-group nzPrefixIcon="lock">
+        <input
+          nz-input
+          type="password"
+          placeholder="Mật khẩu"
+          [(ngModel)]="password"
+          name="password">
+      </nz-input-group>
+
+      <button
+        nz-button
+        nzType="primary"
+        nzBlock
+        class="login-btn">
+
+        Đăng nhập
+
+      </button>
+
+    </form>
+
+  </div>
+
+</div>

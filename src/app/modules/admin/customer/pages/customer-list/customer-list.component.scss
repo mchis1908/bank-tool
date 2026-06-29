@@ -1,0 +1,37 @@
+// src/app/modules/admin/customer/pages/customer-list/customer-list.component.scss
+.customer-list-page {
+  padding: 24px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  .page-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .page-actions {
+    display: flex;
+    gap: 8px;
+  }
+}
+
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  .search-input {
+    flex: 1;
+    max-width: 320px;
+  }
+
+  .status-filter {
+    width: 220px;
+  }
+}
