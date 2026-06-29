@@ -33,10 +33,15 @@
           name="password">
       </nz-input-group>
 
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
       <button
         nz-button
         nzType="primary"
         nzBlock
+        [nzLoading]="loading"
         class="login-btn">
 
         Đăng nhập
@@ -47,4 +52,4 @@
 
   </div>
 
-</div>
+</div>
